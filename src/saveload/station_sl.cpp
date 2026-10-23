@@ -410,7 +410,7 @@ public:
 	{
 		if (IsSavegameVersionBefore(SaveLoadVersion::NewGRFCargo)) return 12;
 		if (IsSavegameVersionBefore(SaveLoadVersion::ExtendCargotypes)) return 32;
-		if (IsSavegameVersionBefore(SaveLoadVersion::SaveloadListLength)) return NUM_CARGO;
+		if (IsSavegameVersionBefore(SaveLoadVersion::SaveloadListLength)) return 64; // NUM_CARGO before WideCargoTypes
 		/* Read from the savegame how long the list is. */
 		return SlGetStructListLength(NUM_CARGO);
 	}
@@ -474,7 +474,7 @@ public:
 	{
 		Station *st = Station::From(bst);
 
-		size_t num_cargo = IsSavegameVersionBefore(SaveLoadVersion::NewGRFCargo) ? 12 : IsSavegameVersionBefore(SaveLoadVersion::ExtendCargotypes) ? 32 : NUM_CARGO;
+		size_t num_cargo = IsSavegameVersionBefore(SaveLoadVersion::NewGRFCargo) ? 12 : IsSavegameVersionBefore(SaveLoadVersion::ExtendCargotypes) ? 32 : IsSavegameVersionBefore(SaveLoadVersion::WideCargoTypes) ? 64 : NUM_CARGO;
 		auto end = std::next(std::begin(st->goods), std::min(num_cargo, std::size(st->goods)));
 		for (auto it = std::begin(st->goods); it != end; ++it) {
 			GoodsEntry &ge = *it;

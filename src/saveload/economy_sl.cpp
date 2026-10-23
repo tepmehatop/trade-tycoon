@@ -37,7 +37,7 @@ struct CAPRChunkHandler : ChunkHandler {
 
 	void Load() const override
 	{
-		size_t num_cargo = IsSavegameVersionBefore(SaveLoadVersion::NewGRFCargo) ? 12 : IsSavegameVersionBefore(SaveLoadVersion::ExtendCargotypes) ? 32 : NUM_CARGO;
+		size_t num_cargo = IsSavegameVersionBefore(SaveLoadVersion::NewGRFCargo) ? 12 : IsSavegameVersionBefore(SaveLoadVersion::ExtendCargotypes) ? 32 : 64; // Read-only chunk, from before WideCargoTypes
 		size_t record_size = sizeof(uint16_t) + (IsSavegameVersionBefore(SaveLoadVersion::UnifyCurrency) ? sizeof(uint32_t) : sizeof(uint64_t));
 		SlSkipBytes(num_cargo * record_size);
 	}
