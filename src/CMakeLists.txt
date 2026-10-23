@@ -97,6 +97,8 @@ add_files(
     bridge_map.h
     bridge_type.h
     build_vehicle_gui.cpp
+    bundled_content.cpp
+    bundled_content.h
     cachecheck.cpp
     cargo_type.h
     cargoaction.cpp

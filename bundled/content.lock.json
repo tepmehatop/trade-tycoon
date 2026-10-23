@@ -1,0 +1,50 @@
+[
+	{
+		"name": "OpenGFX",
+		"version": "8.0",
+		"unique_id": "4f474658",
+		"md5": "f37d3957d63e0a54523a6b405798d3e3",
+		"file": "content/baseset/4f474658-OpenGFX-8.0.tar",
+		"sha256": "fe294c377d312a4bb7069a787a9892e6337f2ad9345c99ed879f205a132216a1"
+	},
+	{
+		"name": "FIRS Industries 5",
+		"version": "5.2.0",
+		"unique_id": "090025f1",
+		"md5": "6bb8b38e04ece5224bbceca86a4b5e9c",
+		"file": "content/newgrf/f1250009-FIRS_Industries_5-5.2.0.tar",
+		"sha256": "65708760dfa36b520600a9b176bf25d0f44d39bbe40b43fd2537ce9a5d5f1889"
+	},
+	{
+		"name": "CHIPS Station Set 1",
+		"version": "1.10.1",
+		"unique_id": "53504843",
+		"md5": "73997f87a3db0d2534610bfc572f1794",
+		"file": "content/newgrf/43485053-CHIPS_Station_Set_1-1.10.1.tar",
+		"sha256": "3bb4ec4e58453a538fdbb928bf6d08e6f520952c8b9c8beec258057e12e2a15d"
+	},
+	{
+		"name": "Iron Horse 4 (Trains)",
+		"version": "4.36.0",
+		"unique_id": "23124143",
+		"md5": "7e4c686da12cbd943d051ee603617e55",
+		"file": "content/newgrf/43411223-Iron_Horse_4_Trains-4.36.0.tar",
+		"sha256": "8f36374151aa53a8ce0a3e7804cc868afd6b1aaa7b79ca3e9e13b9a5212c2a49"
+	},
+	{
+		"name": "Road Hog (Buses, Trucks, Trams)",
+		"version": "1.4.1",
+		"unique_id": "feea8797",
+		"md5": "04acd20a006e345283d6464678affa8b",
+		"file": "content/newgrf/9787eafe-Road_Hog_Buses_Trucks_Trams-1.4.1.tar",
+		"sha256": "b83b0fb43815e2eec5722ddbbe80a4f01ea0c9c95f7d6965198138e49a4d4663"
+	},
+	{
+		"name": "ITL Houses",
+		"version": "2.3",
+		"unique_id": "01035454",
+		"md5": "19d6c285d9182f8076fd9fc2db870fcb",
+		"file": "content/newgrf/54540301-ITL_Houses-2.3.tar",
+		"sha256": "110fa8e44de2d154ef0b5bf32349fbe8eed98fc41c6fb10166f9d4a5380989d5"
+	}
+]

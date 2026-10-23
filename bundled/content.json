@@ -1,0 +1,11 @@
+{
+	"_comment": "Content bundled with the build. unique_id is the BaNaNaS id (GRF ID for NewGRFs). Fetch with: python3 bundled/fetch_content.py",
+	"content": [
+		{"name": "OpenGFX",                        "type": "base-graphics", "unique_id": "4f474658"},
+		{"name": "FIRS Industries 5",              "type": "newgrf",        "unique_id": "f1250009"},
+		{"name": "CHIPS Station Set 1",            "type": "newgrf",        "unique_id": "43485053"},
+		{"name": "Iron Horse 4 (Trains)",          "type": "newgrf",        "unique_id": "43411223"},
+		{"name": "Road Hog (Buses, Trucks, Trams)", "type": "newgrf",       "unique_id": "9787eafe"},
+		{"name": "ITL Houses (Improved Town Layouts)", "type": "newgrf",    "unique_id": "54540301"}
+	]
+}

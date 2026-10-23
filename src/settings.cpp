@@ -46,6 +46,7 @@
 #include "ai/ai_config.hpp"
 #include "game/game_config.hpp"
 #include "newgrf_config.h"
+#include "bundled_content.h"
 #include "picker_func.h"
 #include "newgrf_badge_config.h"
 #include "base_media_base.h"
@@ -1467,6 +1468,7 @@ void LoadFromConfig(bool startup)
 		}
 
 		_grfconfig_newgame = GRFLoadConfig(generic_ini, "newgrf", false);
+		if (generic_ini.GetGroup("newgrf") == nullptr) AppendBundledNewGRFDefaults(_grfconfig_newgame);
 		_grfconfig_static  = GRFLoadConfig(generic_ini, "newgrf-static", true);
 		AILoadConfig(generic_ini, "ai_players");
 		GameLoadConfig(generic_ini, "game_scripts");

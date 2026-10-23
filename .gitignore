@@ -6,3 +6,7 @@ docs/gamedocs/*
 docs/source/*
 /out
 /vcpkg_installed
+
+# Downloaded by bundled/fetch_content.py (see bundled/content.lock.json)
+/bundled/content/
+__pycache__/

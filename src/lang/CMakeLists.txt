@@ -71,6 +71,15 @@ set(LANG_SOURCE_FILES
         ${CMAKE_CURRENT_SOURCE_DIR}/welsh.txt
 )
 
+# Only English (master) and Russian are maintained for the new mechanics; the
+# other translations stay in the tree to keep upstream merges clean.
+if(NOT OPTION_ALL_LANGUAGES)
+    set(LANG_SOURCE_FILES
+            ${MASTER_LANG_FILE}
+            ${CMAKE_CURRENT_SOURCE_DIR}/russian.txt
+    )
+endif()
+
 set(LANG_BINARY_DIR ${CMAKE_BINARY_DIR}/lang)
 
 if (HOST_BINARY_DIR)
