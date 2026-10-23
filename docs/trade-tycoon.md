@@ -6,6 +6,7 @@
 
 ```sh
 python3 bundled/fetch_content.py      # OpenGFX + NewGRF из BaNaNaS -> bundled/content/ (не в git)
+python3 ../tools/products_grf/build.py   # товары Capitalism Lab -> bundled/content/newgrf/tradetycoon_products.grf (из вашей копии игры, не в git)
 cmake -S . -B build -DCMAKE_BUILD_TYPE=RelWithDebInfo
 cmake --build build -j 16
 build/openttd
@@ -20,6 +21,7 @@ build/openttd
 | Собираются только английский (мастер) и русский языки. Все переводы: `-DOPTION_ALL_LANGUAGES=ON` | `src/lang/CMakeLists.txt`, `cmake/Options.cmake` |
 | Встроенный контент: OpenGFX, ITL Houses, FIRS 5, Iron Horse 4, Road Hog, CHIPS. Копируется в `build/{baseset,newgrf}` | `bundled/` |
 | При первом запуске (в конфиге нет `[newgrf]`) встроенные NewGRF включаются для новых игр | `src/bundled_content.cpp`, `src/settings.cpp` |
+| До 240 типов груза (было 64): каждый товар Capitalism — отдельный груз | `src/core/wide_bitset_type.hpp`, `src/cargo_type.h`, сейвы (`WideCargoTypes`) |
 
 ## Правила
 

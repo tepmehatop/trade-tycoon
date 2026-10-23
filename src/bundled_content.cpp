@@ -16,11 +16,12 @@
 
 /**
  * NewGRFs enabled for new games when the config has no [newgrf] section yet.
- * Order matters: houses, industries, vehicles, stations. Keep in sync with bundled/content.json.
+ * Order matters: houses, industries, products, vehicles, stations. Keep in sync with bundled/content.json.
  */
 static const GrfID _bundled_newgrfs[] = {
 	GrfID{"\x54\x54\x03\x01"}, // ITL Houses (Improved Town Layouts)
 	GrfID{"\xF1\x25\x00\x09"}, // FIRS Industries 5
+	GrfID{"\x54\x54\x01\x01"}, // Trade Tycoon: Capitalism products (generated, see bundled/CMakeLists.txt)
 	GrfID{"\x43\x41\x12\x23"}, // Iron Horse 4 (Trains)
 	GrfID{"\x97\x87\xEA\xFE"}, // Road Hog (Buses, Trucks, Trams)
 	GrfID{"\x43\x48\x50\x53"}, // CHIPS Station Set 1
@@ -36,7 +37,7 @@ void AppendBundledNewGRFDefaults(GRFConfigList &list)
 	for (const GrfID &grfid : _bundled_newgrfs) {
 		const GRFConfig *c = FindGRFConfig(grfid, FindGRFConfigMode::NewestValid);
 		if (c == nullptr) {
-			Debug(Facility::Grf, Severity::Error, "Bundled NewGRF {} not found; run bundled/fetch_content.py", FormatArrayAsHex(grfid));
+			Debug(Facility::Grf, Severity::Error, "Bundled NewGRF {} not found; run bundled/fetch_content.py (products: tools/products_grf/build.py in the project folder)", FormatArrayAsHex(grfid));
 			continue;
 		}
 		AppendToGRFConfigList(list, std::make_unique<GRFConfig>(*c));

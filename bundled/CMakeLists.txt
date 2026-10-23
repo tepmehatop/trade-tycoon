@@ -1,10 +1,11 @@
-# Copy the content downloaded by bundled/fetch_content.py next to the binary,
-# so a fresh build starts with OpenGFX and the bundled NewGRFs available.
+# Copy the content in bundled/content next to the binary, so a fresh build starts with OpenGFX and the
+# bundled NewGRFs available. The .tar files come from bundled/fetch_content.py; tradetycoon_products.grf is
+# generated outside this repository from the player's own Capitalism Lab files (tools/products_grf/build.py).
 
 file(MAKE_DIRECTORY ${CMAKE_BINARY_DIR}/newgrf)
 
 file(GLOB BUNDLED_BASESET_FILES CONFIGURE_DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/content/baseset/*.tar)
-file(GLOB BUNDLED_NEWGRF_FILES CONFIGURE_DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/content/newgrf/*.tar)
+file(GLOB BUNDLED_NEWGRF_FILES CONFIGURE_DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/content/newgrf/*.tar ${CMAKE_CURRENT_SOURCE_DIR}/content/newgrf/*.grf)
 
 if(NOT BUNDLED_NEWGRF_FILES)
     message(WARNING "No bundled content found; run 'python3 bundled/fetch_content.py' to download OpenGFX and the NewGRFs")
