@@ -112,6 +112,31 @@ public:
 	}
 
 	/**
+	 * Get the next parameter as a bit set wider than 64 bits.
+	 * An integer parameter (e.g. from game scripts or old saves) sets the lowest 64 values,
+	 * a string parameter holds hexadecimal words separated by ':'.
+	 * @tparam T The bit set type.
+	 * @return The next parameter's value.
+	 */
+	template <typename T>
+	T GetNextParameterWideBitSet()
+	{
+		const auto &param = this->GetNextParameterReference();
+		if (const uint64_t *low = std::get_if<uint64_t>(&param.data)) return T{*low};
+
+		const std::string *words = std::get_if<std::string>(&param.data);
+		if (words == nullptr) throw std::out_of_range("Attempt to read uninitialised parameter as bit set");
+
+		T result;
+		StringConsumer consumer{*words};
+		for (size_t i = 0; i < T::WORDS && consumer.AnyBytesLeft(); i++) {
+			result.SetWord(i, consumer.ReadIntegerBase<uint64_t>(16));
+			consumer.SkipIf(":");
+		}
+		return result;
+	}
+
+	/**
 	 * Get the next string parameter from our parameters.
 	 * This updates the offset, so the next time this is called the next parameter
 	 * will be read.

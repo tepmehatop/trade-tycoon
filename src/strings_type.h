@@ -92,6 +92,25 @@ struct StringParameter {
 	inline StringParameter(const ConvertibleThroughBase auto &data) : data(static_cast<uint64_t>(data.base())), type(0) {}
 
 	/**
+	 * Create a StringParameter from a bit set wider than 64 bits.
+	 * It is stored as hexadecimal words separated by ':', see StringParameters::GetNextParameterWideBitSet.
+	 * @param data the bit set.
+	 */
+	template <typename T> requires requires(const T &t) { T::WORDS; t.Word(0); }
+	inline StringParameter(const T &data) : type(0)
+	{
+		std::string words;
+		for (size_t i = 0; i < T::WORDS; i++) {
+			if (i != 0) words += ':';
+			uint64_t word = data.Word(i);
+			int shift = 60;
+			while (shift > 0 && (word >> shift) == 0) shift -= 4;
+			for (; shift >= 0; shift -= 4) words += "0123456789abcdef"[(word >> shift) & 0xF];
+		}
+		this->data = std::move(words);
+	}
+
+	/**
 	 * Create a StringParameter from a scoped enum.
 	 * @tparam T the type of the scoped enum.
 	 * @param data the scoped enum value.

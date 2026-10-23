@@ -185,6 +185,9 @@ typedef std::pair<const StationID, std::list<CargoPacket *> > StationCargoPair;
 
 static OldPersistentStorage _old_st_persistent_storage;
 
+static uint64_t _old_always_accepted; ///< Station::always_accepted before SaveLoadVersion::WideCargoTypes.
+static std::array<uint64_t, CargoTypes::WORDS> _always_accepted_words; ///< Station::always_accepted, 64 cargo types per word.
+
 /**
  * Swap the temporary packets with the packets without specific destination in
  * the given goods entry. Assert that at least one of those is empty.
@@ -653,8 +656,9 @@ public:
 		SaveLoad::Variable<VarFileType::U8>("last_vehicle_type", SLE_OBJECT_ADDRESS(Station, last_vehicle_type)),
 		SaveLoad::Variable<VarFileType::U8>("had_vehicle_of_type", SLE_OBJECT_ADDRESS(Station, had_vehicle_of_type)),
 		SaveLoad::ReferenceList<SLRefType::Vehicle>("loading_vehicles", SLE_OBJECT_ADDRESS(Station, loading_vehicles)),
-		SaveLoad::Variable<VarFileType::U32>("always_accepted", SLE_OBJECT_ADDRESS(Station, always_accepted), SaveLoadVersion::TownAcceptance, SaveLoadVersion::ExtendCargotypes),
-		SaveLoad::Variable<VarFileType::U64>("always_accepted", SLE_OBJECT_ADDRESS(Station, always_accepted), SaveLoadVersion::ExtendCargotypes),
+		SaveLoad::Variable<VarFileType::U32>("always_accepted", SLE_GLOBAL_ADDRESS(_old_always_accepted), SaveLoadVersion::TownAcceptance, SaveLoadVersion::ExtendCargotypes),
+		SaveLoad::Variable<VarFileType::U64>("always_accepted", SLE_GLOBAL_ADDRESS(_old_always_accepted), SaveLoadVersion::ExtendCargotypes, SaveLoadVersion::WideCargoTypes),
+		SaveLoad::Array<VarFileType::U64, CargoTypes::WORDS>("always_accepted", SLE_GLOBAL_ADDRESS(_always_accepted_words), SaveLoadVersion::WideCargoTypes),
 		SaveLoad::StructList<SlRoadStopTileData>("speclist", SaveLoadVersion::NewGRFRoadStops, SaveLoadVersion::RoadStopTileData),
 		SaveLoad::StructList<SlStationGoods>("goods"),
 	};
@@ -663,13 +667,24 @@ public:
 	void Save(BaseStation *bst) const override
 	{
 		if (bst->facilities.Test(StationFacility::Waypoint)) return;
+		const CargoTypes &always_accepted = Station::From(bst)->always_accepted;
+		for (size_t i = 0; i < CargoTypes::WORDS; i++) _always_accepted_words[i] = always_accepted.Word(i);
 		SlObject(bst, this->GetDescription());
 	}
 
 	void Load(BaseStation *bst) const override
 	{
 		if (bst->facilities.Test(StationFacility::Waypoint)) return;
+		_old_always_accepted = 0;
+		_always_accepted_words = {};
 		SlObject(bst, this->GetLoadDescription());
+
+		CargoTypes &always_accepted = Station::From(bst)->always_accepted;
+		if (IsSavegameVersionBefore(SaveLoadVersion::WideCargoTypes)) {
+			always_accepted = CargoTypes{_old_always_accepted};
+		} else {
+			for (size_t i = 0; i < CargoTypes::WORDS; i++) always_accepted.SetWord(i, _always_accepted_words[i]);
+		}
 	}
 
 	void FixPointers(BaseStation *bst) const override

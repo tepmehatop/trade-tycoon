@@ -12,6 +12,7 @@
 
 #include "core/label_type.hpp"
 #include "core/enum_type.hpp"
+#include "core/wide_bitset_type.hpp"
 
 /** Globally unique label of a cargo type. */
 using CargoLabel = Label<struct CargoLabelTag>;
@@ -74,7 +75,7 @@ static constexpr CargoLabel CT_NONE = CT_PASSENGERS;
 static constexpr CargoLabel CT_INVALID{"\xFF\xFF\xFF\xFF"}; ///< Invalid cargo type.
 
 static constexpr CargoType NUM_ORIGINAL_CARGO{12}; ///< Original number of cargo types.
-static constexpr CargoType NUM_CARGO{64}; ///< Maximum number of cargo types in a game.
+static constexpr CargoType NUM_CARGO{240}; ///< Maximum number of cargo types in a game; NUM_CARGO + CF_* values must stay below CARGO_AUTO_REFIT.
 
 /* CARGO_AUTO_REFIT and CARGO_NO_REFIT are stored in save-games for refit-orders, so should not be changed. */
 static constexpr CargoType CARGO_AUTO_REFIT{0xFD}; ///< Automatically choose cargo type when doing auto refitting.
@@ -112,9 +113,9 @@ namespace CargoFilterCriteria {
 inline bool IsValidCargoType(CargoType cargo) { return cargo != INVALID_CARGO; }
 
 /** Bitset of \c CargoType elements. */
-using CargoTypes = EnumBitSet<CargoType, uint64_t>;
+using CargoTypes = WideEnumBitSet<CargoType, NUM_CARGO>;
 
-static constexpr CargoTypes ALL_CARGOTYPES{UINT64_MAX};
+static constexpr CargoTypes ALL_CARGOTYPES = CargoTypes{}.Set();
 
 /** Class for storing amounts of cargo */
 struct CargoArray : std::array<uint, NUM_CARGO> {
