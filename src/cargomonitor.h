@@ -55,7 +55,7 @@ static_assert(MAX_COMPANIES <= (1 << CCB_COMPANY_LENGTH));
  */
 inline CargoMonitorID EncodeCargoIndustryMonitor(CompanyID company, CargoType ctype, IndustryID ind)
 {
-	assert(ctype < (1 << CCB_CARGO_TYPE_LENGTH));
+	assert(ctype < NUM_CARGO);
 	assert(company < (1 << CCB_COMPANY_LENGTH));
 
 	uint32_t ret = 0;
@@ -75,7 +75,7 @@ inline CargoMonitorID EncodeCargoIndustryMonitor(CompanyID company, CargoType ct
  */
 inline CargoMonitorID EncodeCargoTownMonitor(CompanyID company, CargoType ctype, TownID town)
 {
-	assert(ctype < (1 << CCB_CARGO_TYPE_LENGTH));
+	assert(ctype < NUM_CARGO);
 	assert(company < (1 << CCB_COMPANY_LENGTH));
 
 	uint32_t ret = 0;

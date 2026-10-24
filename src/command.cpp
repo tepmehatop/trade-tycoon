@@ -55,6 +55,7 @@
 #include "viewport_cmd.h"
 #include "water_cmd.h"
 #include "waypoint_cmd.h"
+#include "tradetycoon/factory_cmd.h"
 #include "misc/endian_buffer.hpp"
 #include "string_func.h"
 

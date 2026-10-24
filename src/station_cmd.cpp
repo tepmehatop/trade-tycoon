@@ -4394,7 +4394,7 @@ void ModifyStationRatingAround(TileIndex tile, Owner owner, int amount, uint rad
 	});
 }
 
-static uint UpdateStationWaiting(Station *st, CargoType cargo, uint amount, Source source)
+static uint UpdateStationWaiting(Station *st, CargoType cargo, uint amount, Source source, uint8_t quality)
 {
 	/* We can't allocate a CargoPacket? Then don't do anything
 	 * at all; i.e. just discard the incoming cargo. */
@@ -4409,7 +4409,9 @@ static uint UpdateStationWaiting(Station *st, CargoType cargo, uint amount, Sour
 	if (amount == 0) return 0;
 
 	StationID next = ge.GetVia(st->index);
-	ge.GetOrCreateData().cargo.Append(CargoPacket::Create(st->index, amount, source), next);
+	CargoPacket *cp = CargoPacket::Create(st->index, amount, source);
+	cp->SetQuality(quality);
+	ge.GetOrCreateData().cargo.Append(cp, next);
 	LinkGraph *lg = nullptr;
 	if (ge.link_graph == LinkGraphID::Invalid()) {
 		if (LinkGraph::CanAllocateItem()) {
@@ -4591,7 +4593,7 @@ static bool CanMoveGoodsToStation(const Station *st, CargoType cargo)
 	return true;
 }
 
-uint MoveGoodsToStation(CargoType cargo, uint amount, Source source, const StationList &all_stations, Owner exclusivity)
+uint MoveGoodsToStation(CargoType cargo, uint amount, Source source, const StationList &all_stations, Owner exclusivity, uint8_t quality)
 {
 	/* Return if nothing to do. Also the rounding below fails for 0. */
 	if (all_stations.empty()) return 0;
@@ -4624,7 +4626,7 @@ uint MoveGoodsToStation(CargoType cargo, uint amount, Source source, const Stati
 	if (used_stations.empty()) {
 		/* only one station around */
 		amount *= first_station->goods[cargo].rating + 1;
-		return UpdateStationWaiting(first_station, cargo, amount, source);
+		return UpdateStationWaiting(first_station, cargo, amount, source, quality);
 	}
 
 	TypedIndexContainer<std::array<uint32_t, OWNER_END.base()>, Owner> company_best = {};  // best rating for each company, including OWNER_NONE
@@ -4670,7 +4672,7 @@ uint MoveGoodsToStation(CargoType cargo, uint amount, Source source, const Stati
 
 	uint moved = 0;
 	for (auto &p : used_stations) {
-		moved += UpdateStationWaiting(p.first, cargo, p.second, source);
+		moved += UpdateStationWaiting(p.first, cargo, p.second, source, quality);
 	}
 
 	return moved;

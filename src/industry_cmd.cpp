@@ -54,6 +54,7 @@
 #include "timer/timer_game_economy.h"
 #include "timer/timer_game_tick.h"
 #include "tradetycoon/deposit.h"
+#include "tradetycoon/factory.h"
 
 #include "table/strings.h"
 #include "table/industry_land.h"
@@ -158,6 +159,7 @@ Industry::~Industry()
 	if (this->location.w == 0) return;
 
 	TradeTycoon::OnIndustryDeleted(this->index);
+	TradeTycoon::OnFactoryDeleted(this->index);
 
 	const bool has_neutral_station = this->neutral_station != nullptr;
 
@@ -424,7 +426,14 @@ static void AddAcceptedCargo_Industry(TileIndex tile, CargoArray &acceptance, Ca
 	auto accepts_cargo = itspec->accepts_cargo;
 	auto cargo_acceptance = itspec->acceptance;
 
-	if (itspec->special_flags.Test(IndustryTileSpecialFlag::AcceptsAllCargo)) {
+	/* A company factory accepts exactly the inputs of its recipe. */
+	const bool company_factory = TradeTycoon::IsCompanyFactory(ind);
+	if (company_factory) {
+		accepts_cargo.fill(INVALID_CARGO);
+		cargo_acceptance.fill(0);
+	}
+
+	if (company_factory || itspec->special_flags.Test(IndustryTileSpecialFlag::AcceptsAllCargo)) {
 		/* Copy all accepted cargoes from industry itself */
 		for (const auto &a : ind->accepted) {
 			auto pos = std::ranges::find(accepts_cargo, a.cargo);
@@ -545,9 +554,10 @@ static bool TransportIndustryGoods(TileIndex tile)
 
 			p.history[THIS_MONTH].production += cw;
 
-			uint am = MoveGoodsToStation(p.cargo, cw, {i->index, SourceType::Industry}, i->stations_near, i->exclusive_consumer);
+			uint am = MoveGoodsToStation(p.cargo, cw, {i->index, SourceType::Industry}, i->stations_near, i->exclusive_consumer, TradeTycoon::GetIndustryCargoQuality(i, p.cargo));
 			p.history[THIS_MONTH].transported += am;
-			TradeTycoon::OnCargoNotShipped(i, cw - am);
+			TradeTycoon::OnCargoNotShipped(i, p.cargo, cw - am);
+			TradeTycoon::OnFactoryCargoNotShipped(i, p.cargo, cw - am);
 
 			moved_cargo |= (am != 0);
 		}
@@ -1991,6 +2001,7 @@ static void DoCreateNewIndustry(Industry *i, TileIndex tile, IndustryType type, 
 	if (!_generating_world) PopulateStationsNearby(i);
 
 	TradeTycoon::OnIndustryFounded(i);
+	TradeTycoon::OnFactoryFounded(i);
 }
 
 /**
@@ -2885,8 +2896,8 @@ static const uint PERCENT_TRANSPORTED_80 = 204;
  */
 static void ChangeIndustryProduction(Industry *i, bool monthly)
 {
-	/* Deposits of companies only close when their reserve runs out. */
-	if (TradeTycoon::IsManagedDeposit(i)) return;
+	/* Deposits of companies only close when their reserve runs out; company factories never change by themselves. */
+	if (TradeTycoon::IsManagedDeposit(i) || TradeTycoon::IsCompanyFactory(i)) return;
 
 	StringID str = STR_NULL;
 	bool closeit = false;
@@ -3163,6 +3174,7 @@ void InitializeIndustries()
 	Industry::industries.fill({});
 	_industry_sound_tile = TileIndex{};
 	TradeTycoon::GetDeposits().clear();
+	TradeTycoon::GetFactories().clear();
 
 	_industry_builder.Reset();
 }

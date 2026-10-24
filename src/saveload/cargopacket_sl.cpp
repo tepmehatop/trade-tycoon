@@ -134,6 +134,7 @@ SaveLoadTable GetCargoPacketDesc()
 		SaveLoad::Variable<VarFileType::U16>("days_in_transit", SLE_OBJECT_ADDRESS(CargoPacket, periods_in_transit), SaveLoadVersion::MoreCargoAge, SaveLoadVersion::PeriodsInTransitRename),
 		SaveLoad::Variable<VarFileType::U16>("periods_in_transit", SLE_OBJECT_ADDRESS(CargoPacket, periods_in_transit), SaveLoadVersion::PeriodsInTransitRename),
 		SaveLoad::Variable<VarFileType::I64>("feeder_share", SLE_OBJECT_ADDRESS(CargoPacket, feeder_share)),
+		SaveLoad::Variable<VarFileType::U8>("quality", SLE_OBJECT_ADDRESS(CargoPacket, quality), SaveLoadVersion::CargoQuality),
 		SaveLoad::Variable<VarFileType::U8>("source_type", SLE_OBJECT_ADDRESS(CargoPacket, source.type), SaveLoadVersion::RemoveSubsidyStationBinding),
 		SaveLoad::Variable<VarFileType::U16>("source_id", SLE_OBJECT_ADDRESS(CargoPacket, source.id), SaveLoadVersion::RemoveSubsidyStationBinding),
 		SaveLoad::Variable<VarFileType::I16>("travelled.x", SLE_OBJECT_ADDRESS(CargoPacket, travelled.x), SaveLoadVersion::CargoTravelled),

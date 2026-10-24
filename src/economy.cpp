@@ -59,6 +59,7 @@
 #include "timer/timer.h"
 #include "timer/timer_game_calendar.h"
 #include "timer/timer_game_economy.h"
+#include "tradetycoon/factory.h"
 
 #include "table/strings.h"
 #include "table/pricebase.h"
@@ -1029,9 +1030,10 @@ static SmallIndustryList _cargo_delivery_destinations;
  * @param num_pieces Amount of cargo delivered
  * @param source The source of the cargo
  * @param company The company delivering the cargo
+ * @param quality Quality of the cargo, 0 for cargo without quality
  * @return actually accepted pieces of cargo
  */
-static uint DeliverGoodsToIndustry(const Station *st, CargoType cargo_type, uint num_pieces, IndustryID source, CompanyID company)
+static uint DeliverGoodsToIndustry(const Station *st, CargoType cargo_type, uint num_pieces, IndustryID source, CompanyID company, uint8_t quality)
 {
 	/* Find the nearest industrytile to the station sign inside the catchment area, whose industry accepts the cargo.
 	 * This fails in three cases:
@@ -1066,6 +1068,7 @@ static uint DeliverGoodsToIndustry(const Station *st, CargoType cargo_type, uint
 		it->last_accepted = TimerGameEconomy::date;
 		num_pieces -= amount;
 		accepted += amount;
+		TradeTycoon::OnFactoryCargoDelivered(ind, cargo_type, amount, quality);
 
 		/* Update the cargo monitor. */
 		AddCargoDelivery(cargo_type, company, amount, {source, SourceType::Industry}, st, ind->index);
@@ -1083,17 +1086,18 @@ static uint DeliverGoodsToIndustry(const Station *st, CargoType cargo_type, uint
  * @param periods_in_transit Travel time in cargo aging periods
  * @param company The company delivering the cargo
  * @param src Source of cargo
+ * @param quality Quality of the cargo, 0 for cargo without quality
  * @return Revenue for delivering cargo
  * @note The cargo is just added to the stockpile of the industry. It is due to the caller to trigger the industry's production machinery
  */
-static Money DeliverGoods(int num_pieces, CargoType cargo_type, StationID dest, uint distance, uint16_t periods_in_transit, Company *company, Source src)
+static Money DeliverGoods(int num_pieces, CargoType cargo_type, StationID dest, uint distance, uint16_t periods_in_transit, Company *company, Source src, uint8_t quality)
 {
 	assert(num_pieces > 0);
 
 	Station *st = Station::Get(dest);
 
 	/* Give the goods to the industry. */
-	uint accepted_ind = DeliverGoodsToIndustry(st, cargo_type, num_pieces, src.type == SourceType::Industry ? src.ToIndustryID() : IndustryID::Invalid(), company->index);
+	uint accepted_ind = DeliverGoodsToIndustry(st, cargo_type, num_pieces, src.type == SourceType::Industry ? src.ToIndustryID() : IndustryID::Invalid(), company->index, quality);
 
 	/* If this cargo type is always accepted, accept all */
 	uint accepted_total = st->always_accepted.Test(cargo_type) ? num_pieces : accepted_ind;
@@ -1151,6 +1155,9 @@ static void TriggerIndustryProduction(Industry *i)
 		} else {
 			SetWindowDirty(WindowClass::IndustryView, i->index);
 		}
+	} else if (TradeTycoon::IsCompanyFactory(i)) {
+		/* Company factories keep their inputs and process them daily, see tradetycoon/factory.cpp. */
+		SetWindowDirty(WindowClass::IndustryView, i->index);
 	} else {
 		for (auto ita = std::begin(i->accepted); ita != std::end(i->accepted); ++ita) {
 			if (ita->waiting == 0 || !IsValidCargoType(ita->cargo)) continue;
@@ -1218,7 +1225,7 @@ CargoPayment::~CargoPayment()
 void CargoPayment::PayFinalDelivery(CargoType cargo, const CargoPacket *cp, uint count, TileIndex current_tile)
 {
 	/* Handle end of route payment */
-	Money profit = DeliverGoods(count, cargo, this->current_station, cp->GetDistance(current_tile), cp->GetPeriodsInTransit(), Company::Get(this->front->owner), cp->GetSource());
+	Money profit = DeliverGoods(count, cargo, this->current_station, cp->GetDistance(current_tile), cp->GetPeriodsInTransit(), Company::Get(this->front->owner), cp->GetSource(), cp->GetQuality());
 	this->route_profit += profit;
 
 	/* The vehicle's profit is whatever route profit there is minus feeder shares. */

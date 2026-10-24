@@ -108,15 +108,22 @@ void OnIndustryDeleted(IndustryID index)
 /**
  * Return extracted cargo that no station took back to the reserve, like unsold stock of a Capitalism mine.
  * @param i Industry.
+ * @param cargo Extracted cargo.
  * @param amount Cargo units that were not moved to a station.
  */
-void OnCargoNotShipped(const Industry *i, uint amount)
+void OnCargoNotShipped(Industry *i, CargoType cargo, uint amount)
 {
 	if (amount == 0) return;
 	auto it = _deposits.find(i->index);
 	if (it == _deposits.end()) return;
 	Deposit &d = it->second;
 	d.reserve = static_cast<uint32_t>(std::min<uint64_t>(d.initial, static_cast<uint64_t>(d.reserve) + amount));
+
+	/* Cargo back in the ground was not produced. */
+	auto p = i->GetCargoProduced(cargo);
+	if (p == std::end(i->produced)) return;
+	auto &production = p->history[THIS_MONTH].production;
+	production -= std::min<uint16_t>(production, amount);
 }
 
 /**

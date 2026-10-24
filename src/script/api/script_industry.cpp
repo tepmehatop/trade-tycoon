@@ -19,6 +19,8 @@
 #include "../../strings_func.h"
 #include "../../newgrf_industries.h"
 #include "../../industry_cmd.h"
+#include "../../tradetycoon/economy_data.h"
+#include "../../tradetycoon/factory_cmd.h"
 
 #include "table/strings.h"
 
@@ -252,6 +254,22 @@
 	if (!IsValidIndustry(industry_id)) return false;
 
 	return ScriptObject::Command<Commands::IndustrySetFlags>::Do(industry_id, ::IndustryControlFlags(control_flags));
+}
+
+/* static */ bool ScriptIndustry::SetFactoryProduct(IndustryID industry_id, CargoType cargo_type)
+{
+	EnforceCompanyModeValid(false);
+	if (!IsValidIndustry(industry_id)) return false;
+
+	uint16_t recipe = 0;
+	if (ScriptCargo::IsValidCargo(cargo_type)) {
+		const auto &recipes = TradeTycoon::GetEconomyData().recipes;
+		auto it = std::ranges::find(recipes, ::CargoSpec::Get(cargo_type)->label, &TradeTycoon::Recipe::output);
+		if (it == recipes.end()) return false;
+		recipe = static_cast<uint16_t>(std::distance(recipes.begin(), it) + 1);
+	}
+
+	return ScriptObject::Command<Commands::SetFactoryRecipe>::Do(industry_id, recipe);
 }
 
 /* static */ ScriptCompany::CompanyID ScriptIndustry::GetExclusiveSupplier(IndustryID industry_id)

@@ -6075,3 +6075,10 @@ STR_BADGE_FILTER_ANY_LABEL                                      :Any {STRING}
 # Trade Tycoon
 STR_TT_DEPOSIT_INFO                                             :{BLACK}Owner: {COMPANY}{}Reserve: {CARGO_LONG} ({NUM}% left){}Quality: {NUM}, extraction unit level {NUM}
 STR_TT_NEWS_DEPOSIT_EXHAUSTED                                   :{BIG_FONT}{BLACK}{INDUSTRY} has run out of reserves!
+STR_TT_FACTORY_NO_RECIPE                                        :{BLACK}Owner: {COMPANY}{}{ORANGE}Choose a product to start production
+STR_TT_FACTORY_PRODUCT                                          :{BLACK}Owner: {COMPANY}{}Product: {CARGO_LONG} per day at full capacity{}Quality: {NUM}, manufacturing unit level {NUM}
+STR_TT_FACTORY_INPUT                                            :{}{BLACK}Input: {CARGO_LONG} in stock, quality {NUM} (gives {NUM}% of the product quality)
+STR_TT_FACTORY_CHOOSE_PRODUCT                                   :{BLACK}Choose product
+STR_TT_FACTORY_CHOOSE_PRODUCT_TOOLTIP                           :{BLACK}Choose what this factory makes. Its stock of inputs is lost
+STR_TT_FACTORY_STOP                                             :Stop production
+STR_TT_ERROR_CAN_T_CHANGE_PRODUCT                               :{WHITE}Can't change the product of this factory...

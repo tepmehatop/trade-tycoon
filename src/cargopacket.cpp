@@ -88,7 +88,8 @@ CargoPacket::CargoPacket(CargoPacketID index, uint16_t count, Money feeder_share
 		in_vehicle(original.in_vehicle),
 #endif /* WITH_ASSERT */
 		first_station(original.first_station),
-		next_hop(original.next_hop)
+		next_hop(original.next_hop),
+		quality(original.quality)
 {
 	assert(count != 0);
 }
@@ -115,6 +116,9 @@ CargoPacket *CargoPacket::Split(uint new_size)
  */
 void CargoPacket::Merge(CargoPacket *cp)
 {
+	/* Quality of the merged packet is the average weighted by count. */
+	uint total = this->count + cp->count;
+	if (total > 0) this->quality = static_cast<uint8_t>((this->quality * this->count + cp->quality * cp->count) / total);
 	this->count += cp->count;
 	this->feeder_share += cp->feeder_share;
 	delete cp;

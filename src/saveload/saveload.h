@@ -425,6 +425,7 @@ enum class SaveLoadVersion : uint16_t {
 	LabelOrientationUnification, ///< Saveload version: 367, GitHub pull request: 15888\n Unify the orientation in which labels are written.
 	DoubleEndedShips, ///< Saveload version: 368, GitHub pull request: 16002\n Double-ended (NewGRF-only) ships can reverse without turning.
 	WideCargoTypes, ///< Saveload version: 369, Trade Tycoon\n Up to 240 cargo types: wider cargo masks and cargo monitor packing.
+	CargoQuality, ///< Saveload version: 370, Trade Tycoon\n Cargo packets carry the quality of Capitalism products.
 
 	MaxVersion, ///< Highest possible saveload version.
 };

@@ -6336,3 +6336,10 @@ STR_BADGE_FILTER_ANY_LABEL                                      :Любой {STR
 # Trade Tycoon
 STR_TT_DEPOSIT_INFO                                             :{BLACK}Владелец: {COMPANY}{}Запас: {CARGO_LONG} (осталось {NUM}%){}Качество: {NUM}, уровень добывающего юнита {NUM}
 STR_TT_NEWS_DEPOSIT_EXHAUSTED                                   :{BIG_FONT}{BLACK}{INDUSTRY}: месторождение исчерпано!
+STR_TT_FACTORY_NO_RECIPE                                        :{BLACK}Владелец: {COMPANY}{}{ORANGE}Выберите продукцию, чтобы начать производство
+STR_TT_FACTORY_PRODUCT                                          :{BLACK}Владелец: {COMPANY}{}Продукция: {CARGO_LONG} в день при полной загрузке{}Качество: {NUM}, уровень производственного юнита {NUM}
+STR_TT_FACTORY_INPUT                                            :{}{BLACK}Сырьё: {CARGO_LONG} на складе, качество {NUM} (даёт {NUM}% качества продукции)
+STR_TT_FACTORY_CHOOSE_PRODUCT                                   :{BLACK}Выбрать продукцию
+STR_TT_FACTORY_CHOOSE_PRODUCT_TOOLTIP                           :{BLACK}Выбрать, что производит фабрика. Запас сырья при смене пропадает
+STR_TT_FACTORY_STOP                                             :Остановить производство
+STR_TT_ERROR_CAN_T_CHANGE_PRODUCT                               :{WHITE}Не удалось сменить продукцию фабрики...

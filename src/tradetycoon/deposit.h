@@ -16,6 +16,7 @@
 #ifndef TRADETYCOON_DEPOSIT_H
 #define TRADETYCOON_DEPOSIT_H
 
+#include "../cargo_type.h"
 #include "../economy_type.h"
 #include "../industry_type.h"
 
@@ -40,7 +41,7 @@ const Deposit *GetDeposit(IndustryID index);
 bool IsManagedDeposit(const Industry *i);
 void OnIndustryFounded(Industry *i);
 void OnIndustryDeleted(IndustryID index);
-void OnCargoNotShipped(const Industry *i, uint amount);
+void OnCargoNotShipped(Industry *i, CargoType cargo, uint amount);
 Money GetDepositPurchaseCost(IndustryType type);
 std::string GetDepositInfoString(const Industry *i);
 

@@ -50,6 +50,8 @@
 #include "hotkeys.h"
 #include "core/string_consumer.hpp"
 #include "tradetycoon/deposit.h"
+#include "tradetycoon/factory.h"
+#include "tradetycoon/factory_cmd.h"
 
 #include "widgets/industry_widget.h"
 
@@ -812,7 +814,11 @@ public:
 		this->flags.Set(WindowFlag::DisableVpScroll);
 		this->info_height = WidgetDimensions::scaled.framerect.Vertical() + 2 * GetCharacterHeight(FontSize::Normal); // Info panel has at least two lines text.
 
-		this->InitNested(window_number);
+		this->CreateNestedTree();
+		const Industry *ind = Industry::Get(window_number);
+		bool own_factory = TradeTycoon::IsCompanyFactory(ind) && ind->founder == _local_company;
+		this->GetWidget<NWidgetStacked>(WID_IV_TT_RECIPE_SEL)->SetDisplayedPlane(own_factory ? 0 : SZSP_NONE);
+		this->FinishInitNested(window_number);
 		NWidgetViewport *nvp = this->GetWidget<NWidgetViewport>(WID_IV_VIEWPORT);
 		nvp->InitializeViewport(this, Industry::Get(window_number)->location.GetCentreTile(), ScaleZoomGUI(ZoomLevel::Industry));
 
@@ -980,7 +986,7 @@ public:
 			}
 		}
 
-		std::string deposit = TradeTycoon::GetDepositInfoString(i);
+		std::string deposit = TradeTycoon::GetDepositInfoString(i) + TradeTycoon::GetFactoryInfoString(i);
 		if (!deposit.empty()) {
 			ir.top += WidgetDimensions::scaled.vsep_wide;
 			ir.top = DrawStringMultiLine(ir, deposit, TextColour::Black);
@@ -1111,7 +1117,26 @@ public:
 			case WID_IV_GRAPH:
 				ShowIndustryProductionGraph(this->window_number);
 				break;
+
+			case WID_IV_TT_RECIPE: {
+				std::vector<std::pair<std::string, uint16_t>> recipes;
+				for (uint16_t recipe : TradeTycoon::GetAvailableRecipes()) recipes.emplace_back(TradeTycoon::GetRecipeName(recipe), recipe);
+				std::ranges::sort(recipes);
+
+				DropDownList list;
+				list.push_back(MakeDropDownListStringItem(STR_TT_FACTORY_STOP, 0));
+				for (auto &[name, recipe] : recipes) list.push_back(MakeDropDownListStringItem(std::move(name), recipe));
+				const TradeTycoon::Factory *f = TradeTycoon::GetFactory(this->window_number);
+				ShowDropDownList(this, std::move(list), f == nullptr ? 0 : f->recipe, WID_IV_TT_RECIPE);
+				break;
+			}
 		}
+	}
+
+	void OnDropdownSelect(WidgetID widget, int index, int) override
+	{
+		if (widget != WID_IV_TT_RECIPE) return;
+		Command<Commands::SetFactoryRecipe>::Post(STR_TT_ERROR_CAN_T_CHANGE_PRODUCT, static_cast<IndustryID>(this->window_number), static_cast<uint16_t>(index));
 	}
 
 	void OnTimeout() override
@@ -1222,6 +1247,9 @@ static constexpr std::initializer_list<NWidgetPart> _nested_industry_view_widget
 	NWidget(NWID_HORIZONTAL),
 		NWidget(WWT_PUSHTXTBTN, Colours::Cream, WID_IV_DISPLAY), SetFill(1, 0), SetResize(1, 0), SetStringTip(STR_INDUSTRY_DISPLAY_CHAIN, STR_INDUSTRY_DISPLAY_CHAIN_TOOLTIP),
 		NWidget(WWT_PUSHTXTBTN, Colours::Cream, WID_IV_GRAPH), SetFill(1, 0), SetResize(1, 0), SetStringTip(STR_INDUSTRY_VIEW_CARGO_GRAPH, STR_INDUSTRY_VIEW_CARGO_GRAPH_TOOLTIP),
+		NWidget(NWID_SELECTION, Colours::Invalid, WID_IV_TT_RECIPE_SEL),
+			NWidget(WWT_DROPDOWN, Colours::Cream, WID_IV_TT_RECIPE), SetFill(1, 0), SetResize(1, 0), SetStringTip(STR_TT_FACTORY_CHOOSE_PRODUCT, STR_TT_FACTORY_CHOOSE_PRODUCT_TOOLTIP),
+		EndContainer(),
 		NWidget(WWT_RESIZEBOX, Colours::Cream),
 	EndContainer(),
 };

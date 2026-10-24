@@ -56,6 +56,8 @@ private:
 	StationID first_station = StationID::Invalid(); ///< The station where the cargo came from first.
 	StationID next_hop = StationID::Invalid(); ///< Station where the cargo wants to go next.
 
+	uint8_t quality = 0; ///< Quality of Capitalism products, 1..100; 0 for other cargo.
+
 	/** The CargoList caches, thus needs to know about it. */
 	template <class Tinst, class Tcont> friend class CargoList;
 	friend class VehicleCargoList;
@@ -158,6 +160,24 @@ public:
 	inline Money GetFeederShare() const
 	{
 		return this->feeder_share;
+	}
+
+	/**
+	 * Gets the quality of the cargo.
+	 * @return Quality 1..100, or 0 if the cargo has no quality.
+	 */
+	inline uint8_t GetQuality() const
+	{
+		return this->quality;
+	}
+
+	/**
+	 * Sets the quality of the cargo.
+	 * @param quality Quality 1..100, or 0 if the cargo has no quality.
+	 */
+	inline void SetQuality(uint8_t quality)
+	{
+		this->quality = quality;
 	}
 
 	/**

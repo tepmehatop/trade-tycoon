@@ -10,6 +10,7 @@
 #include "../stdafx.h"
 #include "../debug.h"
 #include "../fileio_func.h"
+#include "../string_func.h"
 #include "economy_data.h"
 
 #include "../3rdparty/nlohmann/json.hpp"
@@ -32,6 +33,43 @@ const ResourceSpec *EconomyData::FindResource(CargoLabel label) const
 		if (r.label == label) return &r;
 	}
 	return nullptr;
+}
+
+/**
+ * Find the units of a product.
+ * @param label Cargo label of the product.
+ * @return The product, or nullptr if the cargo is no Capitalism product.
+ */
+const ProductSpec *EconomyData::FindProduct(CargoLabel label) const
+{
+	for (const ProductSpec &p : this->products) {
+		if (p.label == label) return &p;
+	}
+	return nullptr;
+}
+
+/**
+ * Quality share of the production technology: 100 minus the shares of the inputs.
+ * @return The maximum production quality.
+ */
+uint8_t Recipe::MaxProductionQuality() const
+{
+	int share = 100;
+	for (const RecipeInput &in : this->inputs) share -= in.iqua;
+	return static_cast<uint8_t>(std::max(0, share));
+}
+
+/**
+ * Convert a 4 character string into a cargo label.
+ * @param text The label text.
+ * @param[out] label The label.
+ * @return Whether the text was a valid label.
+ */
+static bool ParseLabel(const std::string &text, CargoLabel &label)
+{
+	if (text.size() != 4) return false;
+	std::copy_n(text.begin(), 4, label.begin());
+	return true;
 }
 
 /**
@@ -61,11 +99,14 @@ static bool LoadEconomyData(EconomyData &data)
 		std::copy(productivity.begin(), productivity.end(), data.level_productivity.begin());
 		std::copy(capacity.begin(), capacity.end(), data.level_capacity.begin());
 
+		if (!ConvertHexToBytes(json.at("grfid").get<std::string>(), data.grfid)) return false;
+		data.factory_local_id = json.at("factory_local_id").get<uint16_t>();
+		data.factory_space = json.at("factory_space").get<uint16_t>();
+		data.base_tech_ratio = json.at("base_tech_ratio").get<double>();
+
 		for (const auto &item : json.at("resources")) {
 			ResourceSpec &r = data.resources.emplace_back();
-			std::string label = item.at("label").get<std::string>();
-			if (label.size() != 4) return false;
-			std::copy_n(label.begin(), 4, r.label.begin());
+			if (!ParseLabel(item.at("label").get<std::string>(), r.label)) return false;
 			r.speed = item.at("speed").get<uint8_t>();
 			r.res_qty = item.at("res_qty").get<uint16_t>();
 			r.res_cost = item.at("res_cost").get<uint8_t>();
@@ -73,6 +114,30 @@ static bool LoadEconomyData(EconomyData &data)
 			r.quality_hi = item.at("quality_hi").get<uint8_t>();
 			r.units_per_cell = item.at("units_per_cell").get<double>();
 			if (r.quality_hi < r.quality_lo || r.units_per_cell <= 0) return false;
+		}
+
+		for (const auto &item : json.at("products")) {
+			ProductSpec &p = data.products.emplace_back();
+			if (!ParseLabel(item.at("label").get<std::string>(), p.label)) return false;
+			p.cell_items = item.at("cell_items").get<double>();
+			p.items_per_unit = item.at("items_per_unit").get<double>();
+			if (p.cell_items <= 0 || p.items_per_unit <= 0) return false;
+		}
+
+		for (const auto &item : json.at("recipes")) {
+			Recipe &r = data.recipes.emplace_back();
+			if (!ParseLabel(item.at("output").get<std::string>(), r.output)) return false;
+			r.oqty = item.at("oqty").get<uint16_t>();
+			r.prod_speed = item.at("prod_speed").get<uint16_t>();
+			for (const auto &in : item.at("inputs")) {
+				RecipeInput &ri = r.inputs.emplace_back();
+				if (!ParseLabel(in.at("label").get<std::string>(), ri.label)) return false;
+				ri.iqty = in.at("iqty").get<uint16_t>();
+				ri.iqua = in.at("iqua").get<uint8_t>();
+			}
+			if (r.oqty == 0 || r.inputs.empty() || r.inputs.size() > 3) return false;
+			if (std::ranges::any_of(r.inputs, [&data](const RecipeInput &in) { return data.FindProduct(in.label) == nullptr || in.iqty == 0; })) return false;
+			if (data.FindProduct(r.output) == nullptr) return false;
 		}
 	} catch (const nlohmann::json::exception &e) {
 		Debug(Facility::Misc, Severity::Error, "Invalid {}: {}", ECONOMY_DATA_FILE, e.what());
