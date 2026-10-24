@@ -10,3 +10,4 @@ docs/source/*
 # Downloaded by bundled/fetch_content.py (see bundled/content.lock.json)
 /bundled/content/
 __pycache__/
+.DS_Store
