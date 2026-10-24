@@ -6332,3 +6332,7 @@ STR_BADGE_CONFIG_FILTERS                                        :{WHITE}Филь
 STR_BADGE_CONFIG_PREVIEW                                        :Предпросмотр
 STR_BADGE_CONFIG_NAME                                           :Название
 STR_BADGE_FILTER_ANY_LABEL                                      :Любой {STRING}
+
+# Trade Tycoon
+STR_TT_DEPOSIT_INFO                                             :{BLACK}Владелец: {COMPANY}{}Запас: {CARGO_LONG} (осталось {NUM}%){}Качество: {NUM}, уровень добывающего юнита {NUM}
+STR_TT_NEWS_DEPOSIT_EXHAUSTED                                   :{BIG_FONT}{BLACK}{INDUSTRY}: месторождение исчерпано!

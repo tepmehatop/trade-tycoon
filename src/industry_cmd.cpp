@@ -53,6 +53,7 @@
 #include "timer/timer_game_calendar.h"
 #include "timer/timer_game_economy.h"
 #include "timer/timer_game_tick.h"
+#include "tradetycoon/deposit.h"
 
 #include "table/strings.h"
 #include "table/industry_land.h"
@@ -155,6 +156,8 @@ Industry::~Industry()
 	 * This means that we do not have to clear tiles either.
 	 * Also we must not decrement industry counts in that case. */
 	if (this->location.w == 0) return;
+
+	TradeTycoon::OnIndustryDeleted(this->index);
 
 	const bool has_neutral_station = this->neutral_station != nullptr;
 
@@ -544,6 +547,7 @@ static bool TransportIndustryGoods(TileIndex tile)
 
 			uint am = MoveGoodsToStation(p.cargo, cw, {i->index, SourceType::Industry}, i->stations_near, i->exclusive_consumer);
 			p.history[THIS_MONTH].transported += am;
+			TradeTycoon::OnCargoNotShipped(i, cw - am);
 
 			moved_cargo |= (am != 0);
 		}
@@ -1179,8 +1183,11 @@ static void ProduceIndustryGoods(Industry *i)
 
 	i->counter--;
 
+	/* Deposits of companies extract by their own rules, see tradetycoon/deposit.cpp. */
+	const bool deposit = TradeTycoon::IsManagedDeposit(i);
+
 	/* If using an industry callback, scale the callback interval by cargo scale percentage. */
-	if (indsp->callback_mask.Test(IndustryCallbackMask::Production256Ticks)) {
+	if (!deposit && indsp->callback_mask.Test(IndustryCallbackMask::Production256Ticks)) {
 		if (i->counter % ScaleByInverseCargoScale(Ticks::INDUSTRY_PRODUCE_TICKS, false) == 0) {
 			IndustryProductionCallback(i, 1);
 			ProduceIndustryGoodsHelper(i, false);
@@ -1193,7 +1200,7 @@ static void ProduceIndustryGoods(Industry *i)
 	 */
 	if ((i->counter % Ticks::INDUSTRY_PRODUCE_TICKS) == 0) {
 		/* Handle non-callback cargo production. */
-		if (!indsp->callback_mask.Test(IndustryCallbackMask::Production256Ticks)) ProduceIndustryGoodsHelper(i, true);
+		if (!deposit && !indsp->callback_mask.Test(IndustryCallbackMask::Production256Ticks)) ProduceIndustryGoodsHelper(i, true);
 
 		IndustryBehaviours indbehav = indsp->behaviour;
 
@@ -1982,6 +1989,8 @@ static void DoCreateNewIndustry(Industry *i, TileIndex tile, IndustryType type, 
 	SetWindowDirty(WindowClass::BuildIndustry, 0);
 
 	if (!_generating_world) PopulateStationsNearby(i);
+
+	TradeTycoon::OnIndustryFounded(i);
 }
 
 /**
@@ -2145,7 +2154,10 @@ CommandCost CmdBuildIndustry(DoCommandFlags flags, TileIndex tile, IndustryType 
 		AdvertiseIndustryOpening(ind);
 	}
 
-	return CommandCost(ExpensesType::Other, indspec->GetConstructionCost());
+	CommandCost cost(ExpensesType::Other, indspec->GetConstructionCost());
+	/* A company funding a natural resource industry also buys the reserve. */
+	if (Company::IsValidID(_current_company)) cost.AddCost(TradeTycoon::GetDepositPurchaseCost(it));
+	return cost;
 }
 
 /**
@@ -2873,6 +2885,9 @@ static const uint PERCENT_TRANSPORTED_80 = 204;
  */
 static void ChangeIndustryProduction(Industry *i, bool monthly)
 {
+	/* Deposits of companies only close when their reserve runs out. */
+	if (TradeTycoon::IsManagedDeposit(i)) return;
+
 	StringID str = STR_NULL;
 	bool closeit = false;
 	const IndustrySpec *indspec = GetIndustrySpec(i->type);
@@ -3147,6 +3162,7 @@ void InitializeIndustries()
 {
 	Industry::industries.fill({});
 	_industry_sound_tile = TileIndex{};
+	TradeTycoon::GetDeposits().clear();
 
 	_industry_builder.Reset();
 }

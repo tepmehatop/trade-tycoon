@@ -5,7 +5,7 @@
 file(MAKE_DIRECTORY ${CMAKE_BINARY_DIR}/newgrf)
 
 file(GLOB BUNDLED_BASESET_FILES CONFIGURE_DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/content/baseset/*.tar)
-file(GLOB BUNDLED_NEWGRF_FILES CONFIGURE_DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/content/newgrf/*.tar ${CMAKE_CURRENT_SOURCE_DIR}/content/newgrf/*.grf)
+file(GLOB BUNDLED_NEWGRF_FILES CONFIGURE_DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/content/newgrf/*.tar ${CMAKE_CURRENT_SOURCE_DIR}/content/newgrf/*.grf ${CMAKE_CURRENT_SOURCE_DIR}/content/newgrf/*.json)
 
 if(NOT BUNDLED_NEWGRF_FILES)
     message(WARNING "No bundled content found; run 'python3 bundled/fetch_content.py' to download OpenGFX and the NewGRFs")

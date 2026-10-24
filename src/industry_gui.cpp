@@ -49,6 +49,7 @@
 #include "timer/timer_window.h"
 #include "hotkeys.h"
 #include "core/string_consumer.hpp"
+#include "tradetycoon/deposit.h"
 
 #include "widgets/industry_widget.h"
 
@@ -977,6 +978,12 @@ public:
 					ir.top = DrawStringMultiLine(ir, str, TextColour::Yellow);
 				}
 			}
+		}
+
+		std::string deposit = TradeTycoon::GetDepositInfoString(i);
+		if (!deposit.empty()) {
+			ir.top += WidgetDimensions::scaled.vsep_wide;
+			ir.top = DrawStringMultiLine(ir, deposit, TextColour::Black);
 		}
 
 		if (!i->text.empty()) {
