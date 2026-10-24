@@ -10,6 +10,7 @@
 #include "../stdafx.h"
 
 #include "saveload.h"
+#include "tradetycoon_sl.h"
 #include "compat/cargomonitor_sl_compat.h"
 
 #include "../cargomonitor.h"
@@ -44,7 +45,7 @@ static CargoMonitorID FixupCargoMonitor(CargoMonitorID number)
 }
 
 /**
- * Before SaveLoadVersion::WideCargoTypes the cargo type used bits 19-24;
+ * Before TTSaveVersion::WideCargoTypes the cargo type used bits 19-24;
  * it now uses bits 17-24 to fit 8 bits. Bits 17-18 were unused.
  * @param number Cargo monitor number in the old packing.
  * @return Cargo monitor number in the current packing.
@@ -86,7 +87,7 @@ struct CMDLChunkHandler : ChunkHandler {
 
 		TempStorage storage;
 		bool fix = IsSavegameVersionBefore(SaveLoadVersion::FixCargoMonitor);
-		bool fix_wide = IsSavegameVersionBefore(SaveLoadVersion::WideCargoTypes);
+		bool fix_wide = IsTTSavegameVersionBefore(TTSaveVersion::WideCargoTypes);
 
 		ClearCargoDeliveryMonitoring();
 		for (;;) {
@@ -131,7 +132,7 @@ struct CMPUChunkHandler : ChunkHandler {
 
 		TempStorage storage;
 		bool fix = IsSavegameVersionBefore(SaveLoadVersion::FixCargoMonitor);
-		bool fix_wide = IsSavegameVersionBefore(SaveLoadVersion::WideCargoTypes);
+		bool fix_wide = IsTTSavegameVersionBefore(TTSaveVersion::WideCargoTypes);
 
 		ClearCargoPickupMonitoring();
 		for (;;) {

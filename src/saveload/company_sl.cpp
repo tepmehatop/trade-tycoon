@@ -361,8 +361,8 @@ public:
 
 		SaveLoad::Variable<VarFileType::I32>("delivered_cargo[NUM_CARGO - 1]", SLE_OBJECT_ADDRESS(CompanyEconomyEntry, delivered_cargo[NUM_CARGO - 1]), SaveLoadVersion::MinVersion, SaveLoadVersion::CountIndividualCargoes),
 		SaveLoad::Array<VarFileType::U32, 32>("delivered_cargo", SLE_OBJECT_ADDRESS(CompanyEconomyEntry, delivered_cargo), SaveLoadVersion::CountIndividualCargoes, SaveLoadVersion::ExtendCargotypes),
-		SaveLoad::Array<VarFileType::U32, 64>("delivered_cargo", SLE_OBJECT_ADDRESS(CompanyEconomyEntry, delivered_cargo), SaveLoadVersion::ExtendCargotypes, SaveLoadVersion::WideCargoTypes),
-		SaveLoad::Array<VarFileType::U32, NUM_CARGO>("delivered_cargo", SLE_OBJECT_ADDRESS(CompanyEconomyEntry, delivered_cargo), SaveLoadVersion::WideCargoTypes),
+		SaveLoad::Array<VarFileType::U32, 64>("delivered_cargo", SLE_OBJECT_ADDRESS(CompanyEconomyEntry, delivered_cargo), SaveLoadVersion::ExtendCargotypes), // Upstream: 64 cargo types.
+		SaveLoad::Array<VarFileType::U32, NUM_CARGO>("delivered_cargo_tt", SLE_OBJECT_ADDRESS(CompanyEconomyEntry, delivered_cargo)), // Trade Tycoon: all cargo types, overrides the above.
 		SaveLoad::Variable<VarFileType::I32>("performance_history", SLE_OBJECT_ADDRESS(CompanyEconomyEntry, performance_history)),
 	};
 	static inline const SaveLoadCompatTable compat_description = _company_economy_compat;

@@ -10,6 +10,7 @@
 #include "../stdafx.h"
 
 #include "saveload.h"
+#include "tradetycoon_sl.h"
 #include "compat/station_sl_compat.h"
 
 #include "../station_base.h"
@@ -185,7 +186,7 @@ typedef std::pair<const StationID, std::list<CargoPacket *> > StationCargoPair;
 
 static OldPersistentStorage _old_st_persistent_storage;
 
-static uint64_t _old_always_accepted; ///< Station::always_accepted before SaveLoadVersion::WideCargoTypes.
+static uint64_t _old_always_accepted; ///< Station::always_accepted for the first 64 cargo types, as upstream OpenTTD saves it.
 static std::array<uint64_t, CargoTypes::WORDS> _always_accepted_words; ///< Station::always_accepted, 64 cargo types per word.
 
 /**
@@ -410,7 +411,7 @@ public:
 	{
 		if (IsSavegameVersionBefore(SaveLoadVersion::NewGRFCargo)) return 12;
 		if (IsSavegameVersionBefore(SaveLoadVersion::ExtendCargotypes)) return 32;
-		if (IsSavegameVersionBefore(SaveLoadVersion::SaveloadListLength)) return 64; // NUM_CARGO before WideCargoTypes
+		if (IsSavegameVersionBefore(SaveLoadVersion::SaveloadListLength)) return 64; // NUM_CARGO of upstream OpenTTD
 		/* Read from the savegame how long the list is. */
 		return SlGetStructListLength(NUM_CARGO);
 	}
@@ -474,7 +475,7 @@ public:
 	{
 		Station *st = Station::From(bst);
 
-		size_t num_cargo = IsSavegameVersionBefore(SaveLoadVersion::NewGRFCargo) ? 12 : IsSavegameVersionBefore(SaveLoadVersion::ExtendCargotypes) ? 32 : IsSavegameVersionBefore(SaveLoadVersion::WideCargoTypes) ? 64 : NUM_CARGO;
+		size_t num_cargo = IsSavegameVersionBefore(SaveLoadVersion::NewGRFCargo) ? 12 : IsSavegameVersionBefore(SaveLoadVersion::ExtendCargotypes) ? 32 : IsSavegameVersionBefore(SaveLoadVersion::SaveloadListLength) ? 64 : NUM_CARGO;
 		auto end = std::next(std::begin(st->goods), std::min(num_cargo, std::size(st->goods)));
 		for (auto it = std::begin(st->goods); it != end; ++it) {
 			GoodsEntry &ge = *it;
@@ -657,8 +658,8 @@ public:
 		SaveLoad::Variable<VarFileType::U8>("had_vehicle_of_type", SLE_OBJECT_ADDRESS(Station, had_vehicle_of_type)),
 		SaveLoad::ReferenceList<SLRefType::Vehicle>("loading_vehicles", SLE_OBJECT_ADDRESS(Station, loading_vehicles)),
 		SaveLoad::Variable<VarFileType::U32>("always_accepted", SLE_GLOBAL_ADDRESS(_old_always_accepted), SaveLoadVersion::TownAcceptance, SaveLoadVersion::ExtendCargotypes),
-		SaveLoad::Variable<VarFileType::U64>("always_accepted", SLE_GLOBAL_ADDRESS(_old_always_accepted), SaveLoadVersion::ExtendCargotypes, SaveLoadVersion::WideCargoTypes),
-		SaveLoad::Array<VarFileType::U64, CargoTypes::WORDS>("always_accepted", SLE_GLOBAL_ADDRESS(_always_accepted_words), SaveLoadVersion::WideCargoTypes),
+		SaveLoad::Variable<VarFileType::U64>("always_accepted", SLE_GLOBAL_ADDRESS(_old_always_accepted), SaveLoadVersion::ExtendCargotypes),
+		SaveLoad::Array<VarFileType::U64, CargoTypes::WORDS>("always_accepted_tt", SLE_GLOBAL_ADDRESS(_always_accepted_words)), // Trade Tycoon: all cargo types.
 		SaveLoad::StructList<SlRoadStopTileData>("speclist", SaveLoadVersion::NewGRFRoadStops, SaveLoadVersion::RoadStopTileData),
 		SaveLoad::StructList<SlStationGoods>("goods"),
 	};
@@ -669,6 +670,7 @@ public:
 		if (bst->facilities.Test(StationFacility::Waypoint)) return;
 		const CargoTypes &always_accepted = Station::From(bst)->always_accepted;
 		for (size_t i = 0; i < CargoTypes::WORDS; i++) _always_accepted_words[i] = always_accepted.Word(i);
+		_old_always_accepted = always_accepted.Word(0);
 		SlObject(bst, this->GetDescription());
 	}
 
@@ -680,7 +682,7 @@ public:
 		SlObject(bst, this->GetLoadDescription());
 
 		CargoTypes &always_accepted = Station::From(bst)->always_accepted;
-		if (IsSavegameVersionBefore(SaveLoadVersion::WideCargoTypes)) {
+		if (IsTTSavegameVersionBefore(TTSaveVersion::WideCargoTypes)) {
 			always_accepted = CargoTypes{_old_always_accepted};
 		} else {
 			for (size_t i = 0; i < CargoTypes::WORDS; i++) always_accepted.SetWord(i, _always_accepted_words[i]);

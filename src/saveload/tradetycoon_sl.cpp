@@ -10,11 +10,48 @@
 #include "../stdafx.h"
 
 #include "saveload.h"
+#include "saveload_error.hpp"
+#include "tradetycoon_sl.h"
 
 #include "../tradetycoon/deposit.h"
 #include "../tradetycoon/factory.h"
 
+#include "table/strings.h"
+
 #include "../safeguards.h"
+
+TTSaveVersion _tt_savegame_version = TTSaveVersion::None; ///< Trade Tycoon version of the savegame being loaded.
+
+/** Storage of the Trade Tycoon savegame version. */
+struct TTVRStorage {
+	uint16_t version; ///< The version.
+};
+
+static const SaveLoad _version_desc[] = {
+	SaveLoad::Variable<VarFileType::U16>("version", SLE_OBJECT_ADDRESS(TTVRStorage, version)),
+};
+
+/** Trade Tycoon savegame version; saved first, so other chunks can depend on it while loading. */
+struct TTVRChunkHandler : ChunkHandler {
+	TTVRChunkHandler() : ChunkHandler("TTVR", ChunkType::Table) {}
+
+	void Save() const override
+	{
+		SlTableHeader(_version_desc);
+		TTVRStorage storage{to_underlying(TTSaveVersion::Current)};
+		SlSetArrayIndex(0);
+		SlObject(&storage, _version_desc);
+	}
+
+	void Load() const override
+	{
+		const std::vector<SaveLoad> slt = SlTableHeader(_version_desc);
+		TTVRStorage storage{};
+		while (SlIterateArray() != -1) SlObject(&storage, slt);
+		if (storage.version > to_underlying(TTSaveVersion::Current)) SlError(STR_GAME_SAVELOAD_ERROR_TOO_NEW_SAVEGAME);
+		_tt_savegame_version = static_cast<TTSaveVersion>(storage.version);
+	}
+};
 
 /** Deposit with its industry, as stored in the savegame. */
 struct DepositStorage {
@@ -107,9 +144,11 @@ struct TTFCChunkHandler : ChunkHandler {
 	}
 };
 
+static const TTVRChunkHandler TTVR;
 static const TTDPChunkHandler TTDP;
 static const TTFCChunkHandler TTFC;
 static const ChunkHandlerRef tradetycoon_chunk_handlers[] = {
+	TTVR,
 	TTDP,
 	TTFC,
 };
