@@ -23,6 +23,7 @@ build/openttd
 | При первом запуске (в конфиге нет `[newgrf]`) встроенные NewGRF включаются для новых игр | `src/bundled_content.cpp`, `src/settings.cpp` |
 | До 240 типов груза (было 64): каждый товар Capitalism — отдельный груз | `src/core/wide_bitset_type.hpp`, `src/cargo_type.h`, сейвы (`WideCargoTypes`) |
 | Месторождения компаний: запас, качество, суточная добыча, исчерпание (механика 12). Параметры — `tradetycoon_economy.json` рядом с NewGRF товаров | `src/tradetycoon/`, `src/industry_cmd.cpp`, `src/industry_gui.cpp`, сейвы (чанк `TTDP`) |
+| Фабрики компаний с рецептами Capitalism, качество в партиях груза (механики 2, 3) | `src/tradetycoon/factory.cpp`, `src/cargopacket.*`, `src/economy.cpp`, `src/station_cmd.cpp`, команда `SetFactoryRecipe`, `AIIndustry.SetFactoryProduct`, сейвы (`CargoQuality`, чанк `TTFC`) |
 
 ## Правила
 
