@@ -50,6 +50,7 @@ void OnFactoryCargoNotShipped(Industry *i, CargoType cargo, uint amount);
 uint8_t GetIndustryCargoQuality(const Industry *i, CargoType cargo);
 std::vector<uint16_t> GetAvailableRecipes();
 std::string GetRecipeName(uint16_t recipe);
+std::string GetRecipeDescription(uint16_t recipe);
 std::string GetFactoryInfoString(const Industry *i);
 
 } // namespace TradeTycoon

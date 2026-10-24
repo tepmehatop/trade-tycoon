@@ -6343,3 +6343,4 @@ STR_TT_FACTORY_CHOOSE_PRODUCT                                   :{BLACK}Выбр
 STR_TT_FACTORY_CHOOSE_PRODUCT_TOOLTIP                           :{BLACK}Выбрать, что производит фабрика. Запас сырья при смене пропадает
 STR_TT_FACTORY_STOP                                             :Остановить производство
 STR_TT_ERROR_CAN_T_CHANGE_PRODUCT                               :{WHITE}Не удалось сменить продукцию фабрики...
+STR_TT_FACTORY_RECIPE                                           :{RAW_STRING} ← {RAW_STRING}

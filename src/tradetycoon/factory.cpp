@@ -196,6 +196,23 @@ std::string GetRecipeName(uint16_t recipe)
 }
 
 /**
+ * Recipe with its inputs, for choosing a product: "Steel ← Coal + Iron Ore".
+ * @param recipe 1-based recipe index.
+ * @return The description.
+ */
+std::string GetRecipeDescription(uint16_t recipe)
+{
+	const Recipe *r = GetRecipe(recipe);
+	if (r == nullptr) return {};
+	std::string inputs;
+	for (const RecipeInput &in : r->inputs) {
+		if (!inputs.empty()) inputs += " + ";
+		inputs += GetString(CargoSpec::Get(GetCargoTypeByLabel(in.label))->name);
+	}
+	return GetString(STR_TT_FACTORY_RECIPE, GetRecipeName(recipe), inputs);
+}
+
+/**
  * Batches the factory can make per day (CapMain.exe j_mft.cpp 005c1310, method.cpp 005f3590):
  * productivity(level) * SPACE * max(1, PROD_SPEED / 100 * cell_items / OQTY), i.e. about one cell of product per day.
  * @param f Factory.

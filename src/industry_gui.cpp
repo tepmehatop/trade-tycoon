@@ -1125,7 +1125,7 @@ public:
 
 				DropDownList list;
 				list.push_back(MakeDropDownListStringItem(STR_TT_FACTORY_STOP, 0));
-				for (auto &[name, recipe] : recipes) list.push_back(MakeDropDownListStringItem(std::move(name), recipe));
+				for (auto &[name, recipe] : recipes) list.push_back(MakeDropDownListStringItem(TradeTycoon::GetRecipeDescription(recipe), recipe));
 				const TradeTycoon::Factory *f = TradeTycoon::GetFactory(this->window_number);
 				ShowDropDownList(this, std::move(list), f == nullptr ? 0 : f->recipe, WID_IV_TT_RECIPE);
 				break;

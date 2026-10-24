@@ -6082,3 +6082,4 @@ STR_TT_FACTORY_CHOOSE_PRODUCT                                   :{BLACK}Choose p
 STR_TT_FACTORY_CHOOSE_PRODUCT_TOOLTIP                           :{BLACK}Choose what this factory makes. Its stock of inputs is lost
 STR_TT_FACTORY_STOP                                             :Stop production
 STR_TT_ERROR_CAN_T_CHANGE_PRODUCT                               :{WHITE}Can't change the product of this factory...
+STR_TT_FACTORY_RECIPE                                           :{RAW_STRING} ← {RAW_STRING}
