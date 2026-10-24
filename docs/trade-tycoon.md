@@ -22,6 +22,7 @@ build/openttd
 | Встроенный контент: OpenGFX, ITL Houses, FIRS 5, Iron Horse 4, Road Hog, CHIPS. Копируется в `build/{baseset,newgrf}` | `bundled/` |
 | При первом запуске (в конфиге нет `[newgrf]`) встроенные NewGRF включаются для новых игр | `src/bundled_content.cpp`, `src/settings.cpp` |
 | До 240 типов груза (было 64): каждый товар Capitalism — отдельный груз | `src/core/wide_bitset_type.hpp`, `src/cargo_type.h`, сейвы (`WideCargoTypes`) |
+| Месторождения компаний: запас, качество, суточная добыча, исчерпание (механика 12). Параметры — `tradetycoon_economy.json` рядом с NewGRF товаров | `src/tradetycoon/`, `src/industry_cmd.cpp`, `src/industry_gui.cpp`, сейвы (чанк `TTDP`) |
 
 ## Правила
 
