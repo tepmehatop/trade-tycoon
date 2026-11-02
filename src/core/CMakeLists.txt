@@ -33,4 +33,5 @@ add_files(
     strong_typedef_type.hpp
     utf8.cpp
     utf8.hpp
+    wide_bitset_type.hpp
 )

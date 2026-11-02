@@ -26,6 +26,7 @@ add_subdirectory(spriteloader)
 add_subdirectory(table)
 add_subdirectory(tests)
 add_subdirectory(timer)
+add_subdirectory(tradetycoon)
 add_subdirectory(video)
 add_subdirectory(widgets)
 
@@ -97,6 +98,8 @@ add_files(
     bridge_map.h
     bridge_type.h
     build_vehicle_gui.cpp
+    bundled_content.cpp
+    bundled_content.h
     cachecheck.cpp
     cargo_type.h
     cargoaction.cpp

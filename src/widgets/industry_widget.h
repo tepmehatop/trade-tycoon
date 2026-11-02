@@ -30,6 +30,8 @@ enum IndustryViewWidgets : WidgetID {
 	WID_IV_GOTO,     ///< Goto button.
 	WID_IV_DISPLAY,  ///< Display chain button.
 	WID_IV_GRAPH,    ///< Production history button.
+	WID_IV_TT_RECIPE_SEL, ///< Selection to show the product button only for own company factories.
+	WID_IV_TT_RECIPE, ///< Choose the product of a company factory.
 };
 
 /** Widgets of the #IndustryDirectoryWindow class. */

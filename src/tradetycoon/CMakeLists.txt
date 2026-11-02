@@ -1,0 +1,9 @@
+add_files(
+    deposit.cpp
+    deposit.h
+    economy_data.cpp
+    economy_data.h
+    factory.cpp
+    factory.h
+    factory_cmd.h
+)

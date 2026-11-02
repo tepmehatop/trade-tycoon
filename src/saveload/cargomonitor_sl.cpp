@@ -10,6 +10,7 @@
 #include "../stdafx.h"
 
 #include "saveload.h"
+#include "tradetycoon_sl.h"
 #include "compat/cargomonitor_sl_compat.h"
 
 #include "../cargomonitor.h"
@@ -43,6 +44,19 @@ static CargoMonitorID FixupCargoMonitor(CargoMonitorID number)
 	return number;
 }
 
+/**
+ * Before TTSaveVersion::WideCargoTypes the cargo type used bits 19-24;
+ * it now uses bits 17-24 to fit 8 bits. Bits 17-18 were unused.
+ * @param number Cargo monitor number in the old packing.
+ * @return Cargo monitor number in the current packing.
+ */
+static CargoMonitorID FixupWideCargoMonitor(CargoMonitorID number)
+{
+	uint32_t cargo = GB(number, 19, 6);
+	SB(number, 17, 8, cargo);
+	return number;
+}
+
 /** #_cargo_deliveries monitoring map. */
 struct CMDLChunkHandler : ChunkHandler {
 	CMDLChunkHandler() : ChunkHandler("CMDL", ChunkType::Table) {}
@@ -73,6 +87,7 @@ struct CMDLChunkHandler : ChunkHandler {
 
 		TempStorage storage;
 		bool fix = IsSavegameVersionBefore(SaveLoadVersion::FixCargoMonitor);
+		bool fix_wide = IsTTSavegameVersionBefore(TTSaveVersion::WideCargoTypes);
 
 		ClearCargoDeliveryMonitoring();
 		for (;;) {
@@ -80,6 +95,7 @@ struct CMDLChunkHandler : ChunkHandler {
 			SlObject(&storage, slt);
 
 			if (fix) storage.number = FixupCargoMonitor(storage.number);
+			if (fix_wide) storage.number = FixupWideCargoMonitor(storage.number);
 
 			_cargo_deliveries.emplace(storage.number, storage.amount);
 		}
@@ -116,6 +132,7 @@ struct CMPUChunkHandler : ChunkHandler {
 
 		TempStorage storage;
 		bool fix = IsSavegameVersionBefore(SaveLoadVersion::FixCargoMonitor);
+		bool fix_wide = IsTTSavegameVersionBefore(TTSaveVersion::WideCargoTypes);
 
 		ClearCargoPickupMonitoring();
 		for (;;) {
@@ -123,6 +140,7 @@ struct CMPUChunkHandler : ChunkHandler {
 			SlObject(&storage, slt);
 
 			if (fix) storage.number = FixupCargoMonitor(storage.number);
+			if (fix_wide) storage.number = FixupWideCargoMonitor(storage.number);
 
 			_cargo_pickups.emplace(storage.number, storage.amount);
 		}

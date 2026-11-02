@@ -1448,7 +1448,7 @@ static void FormatString(StringBuilder &builder, std::string_view str_arg, Strin
 				}
 
 				case SCC_CARGO_LIST: { // {CARGO_LIST}
-					CargoTypes cmask = args.GetNextParameter<CargoTypes>();
+					CargoTypes cmask = args.GetNextParameterWideBitSet<CargoTypes>();
 					bool first = true;
 
 					std::string_view list_separator = GetListSeparator();

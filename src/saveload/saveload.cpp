@@ -52,6 +52,7 @@
 #include "saveload_filter.h"
 #include "saveload_func.h"
 #include "saveload_internal.h"
+#include "tradetycoon_sl.h"
 
 #include <atomic>
 #ifdef __EMSCRIPTEN__
@@ -242,6 +243,7 @@ static const std::vector<ChunkHandlerRef> &ChunkHandlers()
 	extern const ChunkHandlerTable _economy_chunk_handlers;
 	extern const ChunkHandlerTable _subsidy_chunk_handlers;
 	extern const ChunkHandlerTable _cargomonitor_chunk_handlers;
+	extern const ChunkHandlerTable _tradetycoon_chunk_handlers;
 	extern const ChunkHandlerTable _goal_chunk_handlers;
 	extern const ChunkHandlerTable _story_page_chunk_handlers;
 	extern const ChunkHandlerTable _league_chunk_handlers;
@@ -262,6 +264,7 @@ static const std::vector<ChunkHandlerRef> &ChunkHandlers()
 
 	/** List of all chunks in a savegame. */
 	static const ChunkHandlerTable _chunk_handler_tables[] = {
+		_tradetycoon_chunk_handlers, // First: contains the Trade Tycoon savegame version.
 		_gamelog_chunk_handlers,
 		_map_chunk_handlers,
 		_misc_chunk_handlers,
@@ -3160,6 +3163,9 @@ SaveLoadResult SaveWithFilter(std::shared_ptr<SaveFilter> writer, bool threaded)
  */
 static const SaveLoadFormat *DetermineSaveLoadFormat(SaveLoadFormatTag tag, uint32_t raw_version)
 {
+	/* Trade Tycoon changes are only present if the TTVR chunk says so. */
+	_tt_savegame_version = TTSaveVersion::None;
+
 	auto fmt = std::ranges::find(_saveload_formats, tag, &SaveLoadFormat::tag);
 	if (fmt != std::end(_saveload_formats)) {
 		/* Check version number */
@@ -3347,6 +3353,7 @@ SaveLoadResult SaveOrLoad(std::string_view filename, SaveLoadOperation fop, Deta
 			ClearGRFConfigList(_grfconfig);
 			_gamelog.Reset();
 			if (!LoadOldSaveGame(filename)) return SaveLoadResult::ReInit;
+			_tt_savegame_version = TTSaveVersion::None;
 			_sl_version = SaveLoadVersion::MinVersion;
 			_sl_minor_version = 0;
 			_gamelog.StartAction(GamelogActionType::Load);

@@ -292,6 +292,18 @@ public:
 	static bool SetControlFlags(IndustryID industry_id, SQInteger control_flags);
 
 	/**
+	 * Choose the product of a factory owned by your company (Trade Tycoon).
+	 * The factory then accepts the inputs of the product's recipe.
+	 * @param industry_id The index of the factory.
+	 * @param cargo_type The product, or ScriptCargo::CT_INVALID (-1) to stop production.
+	 * @pre IsValidIndustry(industry_id).
+	 * @pre ScriptCompanyMode::IsValid().
+	 * @return True if the action succeeded.
+	 * @api ai
+	 */
+	static bool SetFactoryProduct(IndustryID industry_id, CargoType cargo_type);
+
+	/**
 	 * Find out which company currently has the exclusive rights to deliver cargo to the industry.
 	 * @param industry_id The index of the industry.
 	 * @pre IsValidIndustry(industry_id).

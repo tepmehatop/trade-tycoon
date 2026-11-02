@@ -21,8 +21,8 @@ struct Station;
  * Encoding is as follows:
  * - bits 0-15 town or industry number
  * - bit 16 is set if it is an industry number (else it is a town number).
- * - bits 19-23 Cargo type.
- * - bits 24-31 %Company number.
+ * - bits 17-24 Cargo type.
+ * - bits 25-28 %Company number.
  */
 typedef uint32_t CargoMonitorID; ///< Type of the cargo monitor number.
 
@@ -37,8 +37,8 @@ extern CargoMonitorMap _cargo_deliveries;
 constexpr uint8_t CCB_TOWN_IND_NUMBER_START = 0; ///< Start bit of the town or industry number.
 constexpr uint8_t CCB_TOWN_IND_NUMBER_LENGTH = 16; ///< Number of bits of the town or industry number.
 constexpr uint8_t CCB_IS_INDUSTRY_BIT = 16; ///< Bit indicating the town/industry number is an industry.
-constexpr uint8_t CCB_CARGO_TYPE_START = 19; ///< Start bit of the cargo type field.
-constexpr uint8_t CCB_CARGO_TYPE_LENGTH = 6; ///< Number of bits of the cargo type field.
+constexpr uint8_t CCB_CARGO_TYPE_START = 17; ///< Start bit of the cargo type field.
+constexpr uint8_t CCB_CARGO_TYPE_LENGTH = 8; ///< Number of bits of the cargo type field.
 constexpr uint8_t CCB_COMPANY_START = 25; ///< Start bit of the company field.
 constexpr uint8_t CCB_COMPANY_LENGTH = 4; ///< Number of bits of the company field.
 
@@ -55,7 +55,7 @@ static_assert(MAX_COMPANIES <= (1 << CCB_COMPANY_LENGTH));
  */
 inline CargoMonitorID EncodeCargoIndustryMonitor(CompanyID company, CargoType ctype, IndustryID ind)
 {
-	assert(ctype < (1 << CCB_CARGO_TYPE_LENGTH));
+	assert(ctype < NUM_CARGO);
 	assert(company < (1 << CCB_COMPANY_LENGTH));
 
 	uint32_t ret = 0;
@@ -75,7 +75,7 @@ inline CargoMonitorID EncodeCargoIndustryMonitor(CompanyID company, CargoType ct
  */
 inline CargoMonitorID EncodeCargoTownMonitor(CompanyID company, CargoType ctype, TownID town)
 {
-	assert(ctype < (1 << CCB_CARGO_TYPE_LENGTH));
+	assert(ctype < NUM_CARGO);
 	assert(company < (1 << CCB_COMPANY_LENGTH));
 
 	uint32_t ret = 0;
